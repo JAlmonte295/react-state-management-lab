@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 
@@ -6,6 +6,10 @@ import './App.css';
 const App = () => {
   const [team, setTeam] = useState([]);
   const [money, setMoney] = useState(100);
+  const [message, setMessage] = useState('');
+  const totalStrength = team.length > 0 ? team.reduce((acc, fighter) => acc + fighter.strength, 0) : 0;
+  const totalAgility = team.length > 0 ? team.reduce((acc, fighter) => acc + fighter.agility, 0) : 0;
+
   const [zombieFighters, setZombieFighters] = useState([
     {
       id: 1,
@@ -89,9 +93,69 @@ const App = () => {
     },
   ]);
 
+  const handleAddFighter = (fighter) => {
+    if (money >= fighter.price) {
+      setTeam([...team, fighter]);
+      setMoney(money - fighter.price);
+      setZombieFighters(zombieFighters.filter((f) => f.id !== fighter.id));
+    } else {
+      console.log('Not enough money!');
+    } 
+  };
+
+  const handleRemoveFighter = (fighter) => {
+    setTeam(team.filter((f) => f.id !== fighter.id));
+    setMoney(money + fighter.price);
+    setZombieFighters([...zombieFighters, fighter]);
+    setMessage(
+      `${fighter.name} was removed from the team. You got $${fighter.price} back. Team strength reduced by ${fighter.strength}.`
+    );
+  };
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   return (
     <div className='App'>
+
       <h1>Zombie Fighters</h1>
+      
+
+      <hr />
+
+      <h2>Money: {money}</h2>
+      <p>Total Strength: {totalStrength}</p>
+      <p>Total Agility: {totalAgility}</p>
+
+      <hr />
+
+      <h2>Your Team</h2>
+      {message && <div className="message">{message}</div>}
+      {team.length === 0 ? (
+        <p>Pick some team members!</p>
+      ) : (
+        <ul>
+          {team.map((fighter) => (
+            <li key={fighter.id}>
+              <img src={fighter.img} alt={fighter.name} />
+              <h3>{fighter.name}</h3>
+              <p>Paid Price: {fighter.price}</p>
+              <p>Strength: {fighter.strength}</p>
+              <p>Agility: {fighter.agility}</p>
+              <button onClick={() => handleRemoveFighter(fighter)}>Remove</button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <hr />
+
       <h2>Available Fighters</h2>
       <ul>
         {zombieFighters.map((fighter) => (
@@ -101,7 +165,7 @@ const App = () => {
             <p>Price: {fighter.price}</p>
             <p>Strength: {fighter.strength}</p>
             <p>Agility: {fighter.agility}</p>
-            <button>Add to Team</button>
+            <button onClick={() => handleAddFighter(fighter)}>Add to Team</button>
           </li>
         ))}
       </ul>
