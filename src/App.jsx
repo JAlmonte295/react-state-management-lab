@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 
-
-
 const App = () => {
   const [team, setTeam] = useState([]);
   const [money, setMoney] = useState(100);
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
   const totalStrength = team.length > 0 ? team.reduce((acc, fighter) => acc + fighter.strength, 0) : 0;
   const totalAgility = team.length > 0 ? team.reduce((acc, fighter) => acc + fighter.agility, 0) : 0;
 
@@ -17,7 +16,7 @@ const App = () => {
       price: 12,
       strength: 6,
       agility: 4,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/0c2d6b.png',
+      img: '/images/survivor.png',
     },
     {
       id: 2,
@@ -25,7 +24,7 @@ const App = () => {
       price: 10,
       strength: 5,
       agility: 5,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/033a16.png',
+      img: '/images/scavenger.png',
     },
     {
       id: 3,
@@ -33,7 +32,7 @@ const App = () => {
       price: 18,
       strength: 7,
       agility: 8,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/262c36.png',
+      img: '/images/shadow.png',
     },
     {
       id: 4,
@@ -41,7 +40,7 @@ const App = () => {
       price: 14,
       strength: 7,
       agility: 6,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/3c1e70.png',
+      img: '/images/tracker.png',
     },
     {
       id: 5,
@@ -49,7 +48,7 @@ const App = () => {
       price: 20,
       strength: 6,
       agility: 8,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/4b2900.png',
+      img: '/images/sharpshooter.png',
     },
     {
       id: 6,
@@ -57,7 +56,7 @@ const App = () => {
       price: 15,
       strength: 5,
       agility: 7,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/5a1e02.png',
+      img: '/images/medic.png',
     },
     {
       id: 7,
@@ -65,7 +64,7 @@ const App = () => {
       price: 16,
       strength: 6,
       agility: 5,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/5e103e.png',
+      img: '/images/engineer.png',
     },
     {
       id: 8,
@@ -73,7 +72,7 @@ const App = () => {
       price: 11,
       strength: 8,
       agility: 3,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/67060c.png',
+      img: '/images/brawler.png',
     },
     {
       id: 9,
@@ -81,7 +80,7 @@ const App = () => {
       price: 17,
       strength: 5,
       agility: 9,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/ac3220.png',
+      img: '/images/infiltrator.png',
     },
     {
       id: 10,
@@ -89,7 +88,7 @@ const App = () => {
       price: 22,
       strength: 7,
       agility: 6,
-      img: 'https://pages.git.generalassemb.ly/modular-curriculum-all-courses/react-state-management-lab/assets/e41f26.png',
+      img: '/images/leader.png',
     },
   ]);
 
@@ -98,8 +97,11 @@ const App = () => {
       setTeam([...team, fighter]);
       setMoney(money - fighter.price);
       setZombieFighters(zombieFighters.filter((f) => f.id !== fighter.id));
+      setMessageType('success');
+      setMessage(`${fighter.name} was added to your team!`);
     } else {
-      console.log('Not enough money!');
+      setMessage('Not enough money for that fighter!');
+      setMessageType('error');
     } 
   };
 
@@ -107,15 +109,17 @@ const App = () => {
     setTeam(team.filter((f) => f.id !== fighter.id));
     setMoney(money + fighter.price);
     setZombieFighters([...zombieFighters, fighter]);
-    setMessage(
+    setMessageType('success');
+    setMessage( () =>
       `${fighter.name} was removed from the team. You got $${fighter.price} back. Team strength reduced by ${fighter.strength}.`
-    );
+    )
   };
 
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
         setMessage('');
+        setMessageType('');
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -124,7 +128,7 @@ const App = () => {
   return (
     <div className='App'>
 
-      <h1>Zombie Fighters</h1>
+      <h1><span className="crossed-out">Zombie</span> Mutant Fighters</h1>
       
 
       <hr />
@@ -136,7 +140,7 @@ const App = () => {
       <hr />
 
       <h2>Your Team</h2>
-      {message && <div className="message">{message}</div>}
+      {message && <div className={`message ${messageType}`}>{message}</div>}
       {team.length === 0 ? (
         <p>Pick some team members!</p>
       ) : (
